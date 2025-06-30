@@ -3,11 +3,11 @@ provider "aws" {
   profile = "cli"
   default_tags {
     tags = {
-      Name      = "${var.project}-vpc"
+      Name      = "${var.project}-s3-backend"
       TERRAFORM = "true"
       ENV       = "${var.env}"
       PROJECT   = "${var.project}"
-      SOURCE    = "module-VPC"
+      SOURCE    = "module-S3-backend"
     }
   }
 }
