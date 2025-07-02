@@ -52,7 +52,7 @@ data "aws_iam_policy_document" "ecs_task_exec_ssm_policy" {
 
 # IAMロールの作成
 resource "aws_iam_role" "ecs_task_exec_role" {
-  name               = "${var.env}-${var.project}-task-ecec_role"
+  name               = "${var.env}-${var.project}-task-exec_role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_exec_assume_role.json
 }
 
@@ -72,3 +72,46 @@ resource "aws_iam_role_policy" "ecs_exec_inline_policy" {
 # ============================
 # IAM ECSタスクロール(実行時権限)
 # ============================
+
+# 信頼ポリシー
+data "aws_iam_policy_document" "ecs_task_assume_role" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    principals {
+      identifiers = [
+        "ecs-tasks.amazonaws.com"
+      ]
+      type = "Service"
+    }
+  }
+}
+
+# タスクロールにアタッチするインラインポリシー
+data "aws_iam_policy_document" "ecs_task" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessage:OpenControlChannel",
+      "ssmmessage:OpenDataChannel"
+    ]
+    resources = ["*"]
+  }
+}
+
+# タスクロール記述
+resource "aws_iam_role" "ecs_task" {
+  name               = "${var.env}-${var.project}-ecs-task-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role.json
+}
+
+# タスクロールにインラインポリシーをアタッチ
+resource "aws_iam_role_policy" "ecs_task_inline_policy" {
+  name   = "${var.env}-${var.project}-ecs-task-policy"
+  policy = data.aws_iam_policy_document.ecs_task.json
+  role   = aws_iam_role.ecs_task.name
+}
