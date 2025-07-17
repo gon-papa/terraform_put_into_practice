@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     profile      = "cli"
     bucket       = "tfstate-storage-9bfq28"
-    key          = "network/terraform.tfsstate"
+    key          = "network/terraform.tfstate"
     region       = "ap-northeast-1"
     use_lockfile = true
     encrypt      = true
